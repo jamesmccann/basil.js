@@ -404,12 +404,20 @@ pub.ungroup = function(pItem) {
  * @method labels
  * @param  {String} label The label identifier
  * @param  {Function} [cb] Optional: The callback function to call with each item in the search result. When this function returns false the loop stops. Passed arguments: item, loopCount
- * @return {PageItem[]} Array of concrete PageItem instances, e.g. TextFrame or SplineItem.
+ * @return {PageItem[]} Array of concrete PageItem instances with the given label, e.g. TextFrame or SplineItem.
  */
 pub.labels = function(label, cb) {
   checkNull(label);
   var result = [];
   var doc = currentDoc();
+
+  for (var i = 0, len = doc.pages.length; i < len; i++) {
+    var page = doc.pages[i];
+    if (page.label === label) {
+      result.push(page);
+    }
+  }
+
   for (var i = 0, len = doc.pageItems.length; i < len; i++) {
     var pageItem = doc.pageItems[i];
     if (pageItem.label === label) {
@@ -420,7 +428,6 @@ pub.labels = function(label, cb) {
   if (arguments.length === 2 && cb instanceof Function) {
     return forEach(result, cb);
   }
-  if(result.length === 0) b.error("b.labels(), no item found with the given label '" + label + "'. Check for line breaks and whitespaces in the script label panel.");
   return result;
 };
 
@@ -431,18 +438,25 @@ pub.labels = function(label, cb) {
  * @subcat Multi-Getters
  * @method label
  * @param  {String} label The label identifier
- * @return {PageItem} The first PageItem of all the hits
- */  
+ * @return {PageItem} The first PageItem with the given label, or undefined if no label found
+ */
 pub.label = function(label) {
   checkNull(label);
   var doc = currentDoc();
+
+  for (var i = 0, len = doc.pages.length; i < len; i++) {
+    var page = doc.pages[i];
+    if (page.label === label) {
+      return page;
+    }
+  }
+
   for (var i = 0, len = doc.pageItems.length; i < len; i++) {
     var pageItem = doc.pageItems[i];
     if (pageItem.label === label) {
-      return pageItem;  
+      return pageItem;
     }
   }
-  b.error("b.label(), no item found with the given label '" + label + "'. Check for line breaks and whitespaces in the script label panel.");
 }
 
 /**
